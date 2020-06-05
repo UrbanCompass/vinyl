@@ -10,4 +10,23 @@ public class Data {
 
     Object value;
 
+    public Data(String name, Object value) {
+        this.typeInfo = value.getClass().getCanonicalName();
+        this.name = name;
+        this.value = value;
+    }
+
+    private Data(){}
+
+    public String getTypeInfo() {
+        return typeInfo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Object getValue() {
+        return value;
+    }
 }

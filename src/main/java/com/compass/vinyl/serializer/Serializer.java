@@ -9,8 +9,8 @@ import java.io.OutputStream;
 
 public interface Serializer {
 
-    // Streaming Apis
-    OutputStream serialize(Scenario scenario);
+    // Non-Streaming Apis (TODO: use steaming api)
+    String serialize(Scenario scenario);
 
-    Scenario deserialize(InputStream serializedData);
+    Scenario deserialize(String serializedData);
 }

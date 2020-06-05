@@ -28,4 +28,26 @@ public class Scenario {
         this.method = method;
         this.inputs = inputs;
     }
+
+    private Scenario() {}
+
+    public String getSource() {
+        return source;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public List<Data> getInputs() {
+        return inputs;
+    }
+
+    public Data getOutput() {
+        return output;
+    }
 }
