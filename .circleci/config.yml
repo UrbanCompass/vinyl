@@ -46,4 +46,4 @@ jobs:
       - run: gradle test
       
       - codecov/upload:
-          file: {{ ~/repo/vinyl/build/jacoco/test.exec }}
+          file: build/jacoco/test.exec
