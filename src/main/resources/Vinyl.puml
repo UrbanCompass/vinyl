@@ -1,0 +1,41 @@
+@startuml
+
+class Scenario {
+    String source
+    String method
+    Data[] inputs
+    Data output
+}
+
+interface RecordPlayer {
+    record(Scenario scenario)
+    Scenario playback(Scenario scenario)
+}
+
+interface Serializer {
+    serialize(Scenario scenario)
+    Scenario deserialize(serializedData)
+}
+
+RecordPlayer --|> LocalFileSystemRecordPlayer
+RecordPlayer --|> SqlLiteRecordPlayer
+
+Serializer --|> JSONSerializer
+Serializer --|> BinarySerializer
+
+class RecordingConfig {
+    String recordingPath
+    Serializer serializer
+}
+
+RecordingConfig -- Serializer
+
+class Vinyl {
+    RecordPlayer player
+    RecordingConfig config
+}
+
+Vinyl --- RecordPlayer
+Vinyl --- RecordingConfig
+
+@enduml
