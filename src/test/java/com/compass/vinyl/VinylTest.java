@@ -104,7 +104,7 @@ public class VinylTest {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.RECORD)
                 .withPlayer(player)
-                .usingRecordingConfig(new RecordingConfig(JSONSerializer.getInstance(), null))
+                .usingRecordingConfig(new RecordingConfig(null, null))
                 .create();
         vinyl.record(expectedScenario);
     }

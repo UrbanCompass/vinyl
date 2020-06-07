@@ -1,13 +1,13 @@
-# Vinyl  [![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl.svg?style=svg&circle-token=a8cb778fca5ae22550cac7d9a394808114a3feed)](https://circleci.com/gh/UrbanCompass/vinyl) [![codecov](https://codecov.io/gh/UrbanCompass/vinyl/branch/master/graph/badge.svg?token=1OJUZZ00ZA)](https://codecov.io/gh/UrbanCompass/vinyl)
+# ![Vinyl](vinyl.png) Vinyl  [![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl.svg?style=svg&circle-token=a8cb778fca5ae22550cac7d9a394808114a3feed)](https://circleci.com/gh/UrbanCompass/vinyl) [![codecov](https://codecov.io/gh/UrbanCompass/vinyl/branch/master/graph/badge.svg?token=1OJUZZ00ZA)](https://codecov.io/gh/UrbanCompass/vinyl)
 A lightweight library to record &amp; replay execution data from various code flows. Here are some basic problems this library is trying to solve:
   - Make integration tests perform at the speed for unit tests (narrow the gap)
   - Improve developer productivity by speeding up local dev/testing cycles that rely on external resource
   - Avoid writing mocks that just needs to mimic a service behavior
   
 ## How does Vinyl solve the above problems?
-Vinyl can directly be integrated into places that are sources of problem. Once Vinyl is integrated, it records the output/response from the underlying call (be it network or datbase or any other slow external resource) and it plays back the recorded data when the same inputs are passed on. This vastly improves the responsiveness of the operation as it short circuits the actual slow operation.
+Vinyl can directly be integrated into places that are sources of problem. Once Vinyl is integrated, it records the output/response from the underlying call (be it network or database or any other slow external resource) and it plays back the recorded data when the same inputs are passed on. This vastly improves the responsiveness of the operation as it short circuits the actual slow operation.
 
-This library has been integarted for network calls in mobile development/testing. Has been a boon for reducing the execution times for backend services that pull data from database & other service calls. It has also made most of the mocks unnecessary as playback is going to act as a mock and provide the actual response stored earlier.
+This library has been integrated for network calls in mobile development/testing. Has been a boon for reducing the execution times for backend services that pull data from database & other service calls. It has also made most of the mocks unnecessary as playback is going to act as a mock and provide the actual response stored earlier.
 
 ## How to integrate Vinyl into existing code?
 Below is a generic mechanism to integrate the library into existing codebase.
