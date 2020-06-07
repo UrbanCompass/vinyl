@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl/tree/master.svg?style=svg)](https://circleci.com/gh/UrbanCompass/vinyl/tree/master)
+[![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl.svg?style=svg&circle-token=a8cb778fca5ae22550cac7d9a394808114a3feed)](https://circleci.com/gh/UrbanCompass/vinyl)
 
 # Vinyl
 A lightweight library to record &amp; replay execution data from various code flows. Here are some basic problems this library is trying to solve:
