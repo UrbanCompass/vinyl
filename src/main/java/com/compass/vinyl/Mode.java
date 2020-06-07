@@ -4,5 +4,5 @@ package com.compass.vinyl;
 
 public enum Mode {
     RECORD,
-    REPLAY
+    PLAYBACK
 }

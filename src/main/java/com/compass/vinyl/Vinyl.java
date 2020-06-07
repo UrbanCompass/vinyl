@@ -29,7 +29,7 @@ public class Vinyl {
     public Scenario intercept(Scenario scenario) {
         if (mode.equals(Mode.RECORD))
             record(scenario);
-        else if (mode.equals(Mode.REPLAY))
+        else if (mode.equals(Mode.PLAYBACK))
             return playback(scenario);
         return scenario;
     }
