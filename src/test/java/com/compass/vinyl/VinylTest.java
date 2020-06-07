@@ -88,6 +88,17 @@ public class VinylTest {
     }
 
     @Test
+    public void playbackMissingScenario() {
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.PLAYBACK)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+        Scenario scenario = vinyl.playback(new Scenario("NA","NA",null));
+        Assert.assertNull("Scenario doesn't exist but result is not null.", scenario);
+    }
+
+    @Test
     public void recordWithException() {
         // Exception shouldn't be thrown & impact the main flow
         vinyl = new Vinyl.Builder()
