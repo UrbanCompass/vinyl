@@ -9,6 +9,17 @@ Vinyl can directly be integrated into places that are sources of problem. Once V
 
 This library has been integrated for network calls in mobile development/testing. Has been a boon for reducing the execution times for backend services that pull data from database & other service calls. It has also made most of the mocks unnecessary as playback is going to act as a mock and provide the actual response stored earlier.
 
+## What was the impact after integrating Vinyl?
+
+### Integration at the speed of Unit Tests
+Integration tests typically have long execution times as it accesses external resources for loading data. This poses a huge challenge, if we have to run integration tests more frequently (as frequent as the unit tests). With Vinyl recording the data for external interactions, it acts as a stub playing back the recorded data for the given inputs. This makes the integration tests run faster by multifold.
+
+### Developer Productivity
+Vinyl was integrated with Android App with the capacity to record all network calls. Working from remote location, we had a higher latency (>100ms) to most of the apis and subsequently accessing all screens in mobile takes more time due to the high network latency. Post integration, the development iterations are faster as screens respond in a fraction of the second.
+
+### Test Stability
+If the dependent services are down due to restarts or other external issues, we would have the concern of flaky integration tests. With Vinyl, we avoid the dependency on external resources altogether thereby improving the stability and reliability on our integration tests.
+
 ## How to integrate Vinyl into existing code?
 Below is a generic mechanism to integrate the library into existing codebase.
 
