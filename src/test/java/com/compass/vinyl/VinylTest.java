@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class VinylTest {
@@ -57,7 +58,7 @@ public class VinylTest {
 
         expectedScenario = new Scenario(LocalFileSystemRecordPlayerTest.class.getCanonicalName(),
                 "test",
-                Arrays.asList(new Data("birds", birds)),
+                Collections.singletonList(new Data("birds", birds)),
                 new Data("animals", animals));
     }
 
@@ -83,7 +84,7 @@ public class VinylTest {
         List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
         List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
         for (int i = 0; i < expectedAnimals.size(); i++) {
-            Assert.assertTrue("Replay of the scenario failed.", animals.get(i).equals(expectedAnimals.get(i)));
+            Assert.assertEquals("Replay of the scenario failed.", animals.get(i), expectedAnimals.get(i));
         }
     }
 
@@ -128,7 +129,34 @@ public class VinylTest {
         List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
         List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
         for (int i = 0; i < expectedAnimals.size(); i++) {
-            Assert.assertTrue("Replay of the scenario failed.", animals.get(i).equals(expectedAnimals.get(i)));
+            Assert.assertEquals("Replay of the scenario failed.", animals.get(i), expectedAnimals.get(i));
         }
+    }
+
+    @Test
+    public void recordWithMultiInputAndPlayback() {
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.RECORD)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+
+        Scenario scenario1 = new Scenario("source",
+                "method",
+                Collections.singletonList(new Data("input", "input1")),
+                new Data("output","output1"));
+
+        Scenario scenario2 = new Scenario("source",
+                "method",
+                Collections.singletonList(new Data("input", "input2")),
+                new Data("output","output2"));
+
+        vinyl.record(scenario1);
+        vinyl.record(scenario2);
+
+        Scenario output2 = vinyl.playback(new Scenario(scenario2.getSource(), scenario2.getMethod(), scenario2.getInputs()));
+        Assert.assertEquals("Output doesn't match with the recorded data",
+                (String)scenario2.output.value,
+                (String)output2.output.value);
     }
 }

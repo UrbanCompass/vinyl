@@ -32,20 +32,25 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
         String uniqueId = getUniqueId(scenario, serializer);
 
         File file = new File(filePath);
-        boolean created = file.mkdirs();
 
-        if (created) {
-            String filepath = file.getAbsoluteFile() + File.separator + uniqueId + ".vinyl";
-            try (
-                    FileWriter fw = new FileWriter(filepath);
-                    BufferedWriter bw = new BufferedWriter(fw);
-            ) {
-                bw.write(serializedData);
-            }
-            catch (IOException e) {
-                LOG.error("Error occurred while writing the data.", e);
-                return false;
-            }
+        if (!file.exists()) {
+            boolean created = file.mkdirs();
+            if (created)
+                LOG.info("Scenario based folder created. Folder=" + file.getAbsolutePath());
+            else
+                LOG.warn("Scenario based folder couldn't be created. Folder=" + file.getAbsolutePath());
+        }
+
+        String filepath = file.getAbsoluteFile() + File.separator + uniqueId + ".vinyl";
+        try (
+                FileWriter fw = new FileWriter(filepath);
+                BufferedWriter bw = new BufferedWriter(fw);
+        ) {
+            bw.write(serializedData);
+        }
+        catch (IOException e) {
+            LOG.error("Error occurred while writing the data.", e);
+            return false;
         }
         return true;
     }
