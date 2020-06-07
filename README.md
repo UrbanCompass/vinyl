@@ -1,6 +1,4 @@
-[![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl.svg?style=svg&circle-token=a8cb778fca5ae22550cac7d9a394808114a3feed)](https://circleci.com/gh/UrbanCompass/vinyl)
-
-# Vinyl
+# Vinyl  [![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl.svg?style=svg&circle-token=a8cb778fca5ae22550cac7d9a394808114a3feed)](https://circleci.com/gh/UrbanCompass/vinyl)
 A lightweight library to record &amp; replay execution data from various code flows. Here are some basic problems this library is trying to solve:
   - Make integration tests perform at the speed for unit tests (narrow the gap)
   - Improve developer productivity by speeding up local dev/testing cycles that rely on external resource
