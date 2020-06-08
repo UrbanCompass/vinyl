@@ -72,7 +72,7 @@ else {
 ```
 
 ## How to create an instance of Vinyl?
-Like Vinyl music device (from which this library took inspiration from), Vinyl requires a player to record & playback the data. The player also needs to know what serilization format is used in storing/retrieving the data. Right now, Vinyl has support for disk based player & JSON serialization. Here is how to initialze the vinyl library:
+Like Vinyl music device (from which this library took inspiration from), Vinyl requires a player to record & playback the data. The player also needs to know what serialization format is used in storing/retrieving the data. Right now, Vinyl has support for disk based player & JSON serialization. Here is how to initialize the vinyl library:
 ```kotlin
 val serializer: Serializer = JSONSerializer.getInstance()
 
