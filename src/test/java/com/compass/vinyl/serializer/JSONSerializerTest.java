@@ -8,9 +8,9 @@ import com.compass.vinyl.serializer.models.Animal;
 import com.compass.vinyl.serializer.models.Bird;
 import com.compass.vinyl.serializer.models.Lion;
 import com.compass.vinyl.serializer.models.Tiger;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ public class JSONSerializerTest {
     private List<Bird> birds = null;
     private String expectedBirdsJSON = null;
 
-    @Before
+    @BeforeEach
     public void setup() {
         serializer = JSONSerializer.getInstance();
 
@@ -48,7 +48,7 @@ public class JSONSerializerTest {
         Scenario s = new Scenario(this.getClass().getCanonicalName(), "serialize", null, data);
 
         String json = serializer.serialize(s);
-        Assert.assertEquals("JSON does not match", expectedAnimalsJson, json);
+        Assertions.assertEquals(expectedAnimalsJson, json, "JSON does not match");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class JSONSerializerTest {
         Scenario s = new Scenario(this.getClass().getCanonicalName(), "serialize", null, data);
 
         String json = serializer.serialize(s);
-        Assert.assertEquals("JSON does not match", expectedBirdsJSON, json);
+        Assertions.assertEquals(expectedBirdsJSON, json, "JSON does not match");
     }
 
     @Test
@@ -66,7 +66,7 @@ public class JSONSerializerTest {
         List<Animal> extractedAnimals = (List<Animal>) scenario.getOutput().getValue();
 
         for (int i = 0; i < animals.size(); i++) {
-            Assert.assertTrue("Deserialized data doesn't match", animals.get(i).equals(extractedAnimals.get(i)));
+            Assertions.assertTrue(animals.get(i).equals(extractedAnimals.get(i)), "Deserialized data doesn't match");
         }
     }
 
@@ -76,7 +76,7 @@ public class JSONSerializerTest {
         List<Bird> extractedBirds = (List<Bird>) scenario.getOutput().getValue();
 
         for (int i = 0; i < birds.size(); i++) {
-            Assert.assertTrue("Deserialized data doesn't match", birds.get(i).equals(extractedBirds.get(i)));
+            Assertions.assertTrue(birds.get(i).equals(extractedBirds.get(i)), "Deserialized data doesn't match");
         }
     }
 }

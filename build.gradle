@@ -19,7 +19,8 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
     implementation group: 'com.fasterxml.jackson.module', name:'jackson-module-kotlin', version:'2.11.0'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
 }
 
 java {
@@ -40,6 +41,8 @@ jacoco {
 }
 
 test {
+    useJUnitPlatform()
+
     // generate report after the tests are run
     finalizedBy jacocoTestReport
 }

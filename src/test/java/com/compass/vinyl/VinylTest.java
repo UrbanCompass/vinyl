@@ -8,10 +8,7 @@ import com.compass.vinyl.serializer.models.Animal;
 import com.compass.vinyl.serializer.models.Bird;
 import com.compass.vinyl.serializer.models.Lion;
 import com.compass.vinyl.serializer.models.Tiger;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,19 +18,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VinylTest {
 
     private static String recordingPath;
 
     private Vinyl vinyl;
 
-    RecordPlayer player;
+    private static RecordPlayer player;
 
-    Scenario expectedScenario;
+    private static Scenario expectedScenario;
 
-    RecordingConfig config;
+    private static RecordingConfig config;
 
-    @BeforeClass
+    @BeforeAll
     public static void pathSetup() {
         try {
             Path temp = Files.createTempDirectory("vinyl-");
@@ -41,12 +39,6 @@ public class VinylTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Before
-    public void setup() {
-        player = new LocalFileSystemRecordPlayer();
-        config = new RecordingConfig(JSONSerializer.getInstance(), recordingPath);
 
         List<Bird> birds = new ArrayList<>();
         birds.add(new Bird("Parrot"));
@@ -60,9 +52,18 @@ public class VinylTest {
                 "test",
                 Collections.singletonList(new Data("birds", birds)),
                 new Data("animals", animals));
+
+        player = new LocalFileSystemRecordPlayer();
+        config = new RecordingConfig(JSONSerializer.getInstance(), recordingPath);
+    }
+
+    @BeforeEach
+    public void setup() {
+
     }
 
     @Test
+    @Order(-1)
     public void record() {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.RECORD)
@@ -84,7 +85,7 @@ public class VinylTest {
         List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
         List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
         for (int i = 0; i < expectedAnimals.size(); i++) {
-            Assert.assertEquals("Replay of the scenario failed.", animals.get(i), expectedAnimals.get(i));
+            Assertions.assertEquals(animals.get(i), expectedAnimals.get(i), "Replay of the scenario failed.");
         }
     }
 
@@ -96,7 +97,31 @@ public class VinylTest {
                 .usingRecordingConfig(config)
                 .create();
         Scenario scenario = vinyl.playback(new Scenario("NA","NA",null));
-        Assert.assertNull("Scenario doesn't exist but result is not null.", scenario);
+        Assertions.assertNull(scenario, "Scenario doesn't exist but result is not null.");
+    }
+
+    @Test
+    public void playbackChaos() {
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.CHAOS)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+        Scenario scenario = vinyl.playback(expectedScenario);
+        Assertions.assertNotNull(scenario, "In Chaos mode, recorded scenario can't be null only the response can");
+    }
+
+    @Test
+    public void playbackRandomizer() {
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.RANDOMIZER)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+        Scenario scenario = vinyl.playback(expectedScenario);
+        Assertions.assertNotNull(scenario, "In Randomizer mode, recorded scenario can't be null.");
+
+        // TODO check for the output if it is randomized
     }
 
     @Test
@@ -129,7 +154,7 @@ public class VinylTest {
         List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
         List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
         for (int i = 0; i < expectedAnimals.size(); i++) {
-            Assert.assertEquals("Replay of the scenario failed.", animals.get(i), expectedAnimals.get(i));
+            Assertions.assertEquals(animals.get(i), expectedAnimals.get(i), "Replay of the scenario failed.");
         }
     }
 
@@ -155,8 +180,8 @@ public class VinylTest {
         vinyl.record(scenario2);
 
         Scenario output2 = vinyl.playback(new Scenario(scenario2.getSource(), scenario2.getMethod(), scenario2.getInputs()));
-        Assert.assertEquals("Output doesn't match with the recorded data",
-                (String)scenario2.output.value,
-                (String)output2.output.value);
+        Assertions.assertEquals(scenario2.output.value,
+                output2.output.value,
+                "Output doesn't match with the recorded data");
     }
 }

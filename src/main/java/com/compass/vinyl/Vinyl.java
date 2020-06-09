@@ -6,6 +6,8 @@ import com.compass.vinyl.player.RecordPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
+
 /**
  * Vinyl represents the layer to record and playback the scenarios.
  * Mode - determines if the current usage if of recording or playback
@@ -48,7 +50,25 @@ public class Vinyl {
     }
 
     public Scenario playback(Scenario scenario) {
-        return player.playback(scenario, config);
+
+        // In Chaos mode, randomly fail the request
+        if (mode == Mode.CHAOS) {
+            if (Math.random() < 0.5) {
+                return new Scenario(scenario.getSource(), scenario.getMethod(), scenario.getInputs(), null);
+            }
+        }
+
+        Scenario recordedScenario = player.playback(scenario, config);
+        if (mode == Mode.RANDOMIZER) {
+            randomize(recordedScenario);
+        }
+
+        return recordedScenario;
+    }
+
+    private void randomize(Scenario recordedScenario) {
+        // TODO randomize the values in output data
+        return;
     }
 
     public static class Builder {

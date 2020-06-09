@@ -10,10 +10,10 @@ import com.compass.vinyl.serializer.models.Animal;
 import com.compass.vinyl.serializer.models.Bird;
 import com.compass.vinyl.serializer.models.Lion;
 import com.compass.vinyl.serializer.models.Tiger;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,8 +21,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class LocalFileSystemRecordPlayerTest {
 
@@ -34,7 +32,7 @@ public class LocalFileSystemRecordPlayerTest {
 
     RecordingConfig config;
 
-    @BeforeClass
+    @BeforeAll
     public static void pathSetup() {
         try {
             Path temp = Files.createTempDirectory("vinyl-");
@@ -44,7 +42,7 @@ public class LocalFileSystemRecordPlayerTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         player = new LocalFileSystemRecordPlayer();
         config = new RecordingConfig(JSONSerializer.getInstance(), recordingPath);
@@ -66,7 +64,7 @@ public class LocalFileSystemRecordPlayerTest {
     @Test
     public void record() {
         boolean status = player.record(expectedScenario, config);
-        Assert.assertTrue("Recording of the scenario failed.", status);
+        Assertions.assertTrue(status, "Recording of the scenario failed.");
     }
 
     @Test
@@ -75,7 +73,7 @@ public class LocalFileSystemRecordPlayerTest {
         List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
         List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
         for (int i = 0; i < expectedAnimals.size(); i++) {
-            Assert.assertTrue("Replay of the scenario failed.", animals.get(i).equals(expectedAnimals.get(i)));
+            Assertions.assertTrue(animals.get(i).equals(expectedAnimals.get(i)), "Replay of the scenario failed.");
         }
     }
 }
