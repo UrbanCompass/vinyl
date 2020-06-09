@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Vinyl represents the layer to record & playback the scenarios.
+ * Vinyl represents the layer to record and playback the scenarios.
  * Mode - determines if the current usage if of recording or playback
  * RecordingConfig - determines the (de)serialization for data
- * Player - determines where the data is stored & retrieved
+ * Player - determines where the data is stored and retrieved
  *
  */
 public class Vinyl {

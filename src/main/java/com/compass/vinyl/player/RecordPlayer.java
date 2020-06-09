@@ -6,7 +6,7 @@ import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.Scenario;
 
 /**
- * Interface for different types of storing & retrieving scenario data
+ * Interface for different types of storing and retrieving scenario data
  */
 public interface RecordPlayer {
 
@@ -19,6 +19,7 @@ public interface RecordPlayer {
      *      Configuration to be used while recording the scenario including the source storage
      *
      * @return
+     *      status of recording the scenario
      */
     boolean record(Scenario scenario, RecordingConfig config);
 
@@ -31,6 +32,7 @@ public interface RecordPlayer {
      * @param config
      *      Configuration to be used while recording the scenario including the source storage
      * @return
+     *      Scenario that was recorded for this inputs
      */
     Scenario playback(Scenario scenario, RecordingConfig config);
 

@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 /**
  * This record player uses local file system as the storage mechanism with each scenario being
  * hashed out and stored as files. The organization of the data is by creating folder for each of
- * the source & method specified in scenario.
+ * the source and method specified in scenario.
  */
 public class LocalFileSystemRecordPlayer implements RecordPlayer {
 
