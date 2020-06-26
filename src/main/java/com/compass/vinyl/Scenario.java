@@ -12,6 +12,8 @@ public class Scenario {
 
     String identifier;
 
+    ScenarioMetadata metadata;
+
     List<Data> inputs;
 
     Data output;
@@ -49,5 +51,13 @@ public class Scenario {
 
     public Data getOutput() {
         return output;
+    }
+
+    public ScenarioMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(ScenarioMetadata metadata) {
+        this.metadata = metadata;
     }
 }

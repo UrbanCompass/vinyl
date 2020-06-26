@@ -6,7 +6,7 @@ import com.compass.vinyl.player.RecordPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
+import java.util.List;
 
 /**
  * Vinyl represents the layer to record and playback the scenarios.
@@ -17,7 +17,7 @@ import java.util.Random;
  */
 public class Vinyl {
 
-    private static Logger LOG = LoggerFactory.getLogger(Vinyl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Vinyl.class);
 
     private Mode mode;
 
@@ -36,6 +36,12 @@ public class Vinyl {
         return scenario;
     }
 
+    /**
+     * Record the scenario in Vinyl
+     *
+     * @param scenario
+     *      scenario with source, method, inputs and output to be recorded
+     */
     public void record(Scenario scenario) {
         try {
             boolean status = player.record(scenario, config);
@@ -49,6 +55,15 @@ public class Vinyl {
         }
     }
 
+    /**
+     * Play back the scenario if recorded. The identification is based on source, method and inputs
+     *
+     * @param scenario
+     *      scenario with source, method, inputs
+     *
+     * @return
+     *      the recorded scenario (provided the data is not expired)
+     */
     public Scenario playback(Scenario scenario) {
 
         // In Chaos mode, randomly fail the request
@@ -58,12 +73,39 @@ public class Vinyl {
             }
         }
 
+        // Get the recorded scenario
         Scenario recordedScenario = player.playback(scenario, config);
+
+        if (mode == Mode.CACHE) {
+            ScenarioMetadata metadata = recordedScenario.getMetadata();
+            if (metadata != null) {
+                long currentTime = System.currentTimeMillis();
+
+                // Check if the data has expired, if so, do not send the data back
+                if (metadata.getExpiryTimeInMillis() != null && metadata.getExpiryTimeInMillis() > currentTime)
+                    return null;
+            }
+        }
+
         if (mode == Mode.RANDOMIZER) {
             randomize(recordedScenario);
         }
 
         return recordedScenario;
+    }
+
+    /**
+     * Clear the scenario from the recorded data
+     *
+     * @param scenario
+     *      Specific scenario to be cleared (identified by source, method and inputs)
+     */
+    public void clearScenario(Scenario scenario) {
+        player.delete(scenario, config);
+    }
+
+    public void clear(List<String> tags) {
+        player.deleteByTags(tags, config);
     }
 
     private void randomize(Scenario recordedScenario) {

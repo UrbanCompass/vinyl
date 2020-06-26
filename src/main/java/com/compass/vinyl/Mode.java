@@ -6,6 +6,9 @@ public enum Mode {
     RECORD,
     PLAYBACK,
 
+    // Work as a cache
+    CACHE,
+
     // Randomly fail the response
     CHAOS,
 

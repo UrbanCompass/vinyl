@@ -53,6 +53,11 @@ public class VinylTest {
                 Collections.singletonList(new Data("birds", birds)),
                 new Data("animals", animals));
 
+        ScenarioMetadata scenarioMeta = new ScenarioMetadata();
+        scenarioMeta.setExpiryTimeInMillis((System.currentTimeMillis() + (30 * 1000)));
+        scenarioMeta.setTags(Arrays.asList("testTag"));
+        expectedScenario.setMetadata(scenarioMeta);
+
         player = new LocalFileSystemRecordPlayer();
         config = new RecordingConfig(JSONSerializer.getInstance(), recordingPath);
     }
@@ -74,6 +79,7 @@ public class VinylTest {
     }
 
     @Test
+    @Order(0)
     public void playback() {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.PLAYBACK)
@@ -90,6 +96,7 @@ public class VinylTest {
     }
 
     @Test
+    @Order(1)
     public void playbackMissingScenario() {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.PLAYBACK)
@@ -101,6 +108,7 @@ public class VinylTest {
     }
 
     @Test
+    @Order(2)
     public void playbackChaos() {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.CHAOS)
@@ -112,6 +120,7 @@ public class VinylTest {
     }
 
     @Test
+    @Order(3)
     public void playbackRandomizer() {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.RANDOMIZER)
@@ -125,6 +134,7 @@ public class VinylTest {
     }
 
     @Test
+    @Order(4)
     public void recordWithException() {
         // Exception shouldn't be thrown & impact the main flow
         vinyl = new Vinyl.Builder()
@@ -136,6 +146,7 @@ public class VinylTest {
     }
 
     @Test
+    @Order(5)
     public void intercept() {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.RECORD)
@@ -159,6 +170,7 @@ public class VinylTest {
     }
 
     @Test
+    @Order(6)
     public void recordWithMultiInputAndPlayback() {
         vinyl = new Vinyl.Builder()
                 .usingMode(Mode.RECORD)
@@ -183,5 +195,38 @@ public class VinylTest {
         Assertions.assertEquals(scenario2.output.value,
                 output2.output.value,
                 "Output doesn't match with the recorded data");
+    }
+
+    @Test
+    @Order(7)
+    void clearScenario() {
+
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.PLAYBACK)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+
+        // make sure playback works
+        Scenario scenario = vinyl.playback(expectedScenario);
+        List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
+        List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
+        for (int i = 0; i < expectedAnimals.size(); i++) {
+            Assertions.assertEquals(animals.get(i), expectedAnimals.get(i), "Replay of the scenario failed.");
+        }
+
+        // now delete the scenario
+        vinyl.clearScenario(expectedScenario);
+
+        // now playback should be empty
+        scenario = vinyl.playback(expectedScenario);
+
+        // playback should be empty
+        Assertions.assertNull(scenario, "Recorded file should have been cleared");
+    }
+
+    @Test
+    @Order(8)
+    void clear() {
     }
 }

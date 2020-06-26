@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * This record player uses local file system as the storage mechanism with each scenario being
@@ -55,21 +56,6 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
         return true;
     }
 
-    private String getFilePath(Scenario scenario, RecordingConfig config) {
-        String path = config.getRecordingPath();
-        return path + File.separator
-                + cleanupName(scenario.getSource()) + File.separator + cleanupName(scenario.getMethod());
-    }
-
-    private String cleanupName(String filename) {
-        return filename.replaceAll("[^A-Za-z0-9]", "_");
-    }
-
-    private String getUniqueId(Scenario scenario, Serializer serializer) {
-        String inputsJson = serializer.serialize(new Scenario(scenario.getSource(), scenario.getMethod(), scenario.getInputs()));
-        return Utilities.md5(inputsJson);
-    }
-
     @Override
     public Scenario playback(Scenario scenario, RecordingConfig config) {
 
@@ -78,8 +64,9 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
         String uniqueId = getUniqueId(scenario, config.getSerializer());
 
         File file = new File(filePath + File.separator + uniqueId + ".vinyl");
-
         String serializedData = null;
+
+        // Step-2: If file exists get the recorded data
         if (file.exists()) {
             try {
                 serializedData = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
@@ -93,5 +80,47 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
         if (serializedData != null)
             return config.getSerializer().deserialize(serializedData);
         return null;
+    }
+
+    @Override
+    public void delete(Scenario scenario, RecordingConfig config) {
+        // Step-1: Seek the recorded data based on the scenario
+        String filePath = getFilePath(scenario, config);
+        String uniqueId = getUniqueId(scenario, config.getSerializer());
+
+        String recordingPath = filePath + File.separator + uniqueId + ".vinyl";
+        File file = new File(recordingPath);
+
+        // Step-2: If exists delete the file
+        if (file.exists()) {
+            try {
+                boolean status = file.delete();
+                if (!status)
+                    LOG.warn("File not deleted. File path is:" + recordingPath);
+            }
+            catch (Exception e) {
+                LOG.error("Error occurred while deleting the data.", e);
+            }
+        }
+    }
+
+    @Override
+    public void deleteByTags(List<String> tags, RecordingConfig config) {
+
+    }
+
+    private String getFilePath(Scenario scenario, RecordingConfig config) {
+        String path = config.getRecordingPath();
+        return path + File.separator
+                + cleanupName(scenario.getSource()) + File.separator + cleanupName(scenario.getMethod());
+    }
+
+    private String cleanupName(String filename) {
+        return filename.replaceAll("[^A-Za-z0-9]", "_");
+    }
+
+    private String getUniqueId(Scenario scenario, Serializer serializer) {
+        String inputsJson = serializer.serialize(new Scenario(scenario.getSource(), scenario.getMethod(), scenario.getInputs()));
+        return Utilities.md5(inputsJson);
     }
 }

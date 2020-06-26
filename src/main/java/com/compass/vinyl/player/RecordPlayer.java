@@ -5,6 +5,8 @@ package com.compass.vinyl.player;
 import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.Scenario;
 
+import java.util.List;
+
 /**
  * Interface for different types of storing and retrieving scenario data
  */
@@ -35,5 +37,25 @@ public interface RecordPlayer {
      *      Scenario that was recorded for this inputs
      */
     Scenario playback(Scenario scenario, RecordingConfig config);
+
+    /**
+     * Delete the specific scenario
+     *
+     * @param scenario
+     *      Scenario to be deleted.
+     * @param config
+     *      Configuration to be used while deleting
+     */
+    void delete(Scenario scenario, RecordingConfig config);
+
+    /**
+     * Delete scenarios matching the tags. Passing an empty tag list will delete all scenarios.
+     *
+     * @param tags
+     *      Tags used in identifying the scenarios to delete
+     * @param config
+     *      Configuration to be used while deleting
+     */
+    void deleteByTags(List<String> tags, RecordingConfig config);
 
 }
