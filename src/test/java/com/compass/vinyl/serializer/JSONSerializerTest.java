@@ -62,7 +62,7 @@ public class JSONSerializerTest {
 
     @Test
     public void deserialize() {
-        Scenario scenario = serializer.deserialize(expectedAnimalsJson);
+        Scenario scenario = serializer.deserialize(expectedAnimalsJson, Scenario.class);
         List<Animal> extractedAnimals = (List<Animal>) scenario.getOutput().getValue();
 
         for (int i = 0; i < animals.size(); i++) {
@@ -72,7 +72,7 @@ public class JSONSerializerTest {
 
     @Test
     public void deserializeKotlin() {
-        Scenario scenario = serializer.deserialize(expectedBirdsJSON);
+        Scenario scenario = serializer.deserialize(expectedBirdsJSON, Scenario.class);
         List<Bird> extractedBirds = (List<Bird>) scenario.getOutput().getValue();
 
         for (int i = 0; i < birds.size(); i++) {

@@ -228,5 +228,31 @@ public class VinylTest {
     @Test
     @Order(8)
     void clear() {
+
+        // record the scenario first
+        record();
+
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.PLAYBACK)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+
+        // make sure playback works
+        Scenario scenario = vinyl.playback(expectedScenario);
+        List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
+        List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
+        for (int i = 0; i < expectedAnimals.size(); i++) {
+            Assertions.assertEquals(animals.get(i), expectedAnimals.get(i), "Replay of the scenario failed.");
+        }
+
+        // clear the scenario using tags
+        vinyl.clear(expectedScenario.metadata.tags);
+
+        // now playback should be empty
+        scenario = vinyl.playback(expectedScenario);
+
+        // playback should be empty
+        Assertions.assertNull(scenario, "Recorded file should have been cleared using the tag:" + expectedScenario.metadata.tags);
     }
 }

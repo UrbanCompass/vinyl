@@ -85,6 +85,9 @@ public class Vinyl {
                 if (metadata.getExpiryTimeInMillis() != null && metadata.getExpiryTimeInMillis() > currentTime)
                     return null;
             }
+        } else if (mode == Mode.PLAYBACK) {
+            // Ignore the time to live in playback mode
+            return recordedScenario;
         }
 
         if (mode == Mode.RANDOMIZER) {
@@ -110,7 +113,6 @@ public class Vinyl {
 
     private void randomize(Scenario recordedScenario) {
         // TODO randomize the values in output data
-        return;
     }
 
     public static class Builder {

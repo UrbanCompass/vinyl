@@ -6,9 +6,9 @@ import com.compass.vinyl.serializer.Serializer;
 
 public class RecordingConfig {
 
-    Serializer serializer;
+    final Serializer serializer;
 
-    String recordingPath;
+    final String recordingPath;
 
     public RecordingConfig(Serializer serializer, String recordingPath) {
         this.serializer = serializer;

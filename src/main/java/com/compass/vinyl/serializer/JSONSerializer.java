@@ -2,7 +2,6 @@
 
 package com.compass.vinyl.serializer;
 
-import com.compass.vinyl.Scenario;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -12,12 +11,9 @@ import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 public class JSONSerializer implements Serializer {
 
-    private ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
     private static JSONSerializer serializer;
 
@@ -45,10 +41,10 @@ public class JSONSerializer implements Serializer {
     }
 
     @Override
-    public String serialize(Scenario scenario) {
+    public String serialize(Object data) {
         String serializedData = null;
         try {
-            serializedData = mapper.writeValueAsString(scenario);
+            serializedData = mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -56,13 +52,13 @@ public class JSONSerializer implements Serializer {
     }
 
     @Override
-    public Scenario deserialize(String serializedData) {
-        Scenario scenario = null;
+    public <T> T deserialize(String serializedData, Class<T> type) {
+        T data = null;
         try {
-            scenario = mapper.readValue(serializedData, Scenario.class);
+            data = mapper.readValue(serializedData, type);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        return scenario;
+        return data;
     }
 }

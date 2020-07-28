@@ -2,15 +2,10 @@
 
 package com.compass.vinyl.serializer;
 
-import com.compass.vinyl.Scenario;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-
 public interface Serializer {
 
     // Non-Streaming Apis (TODO: use steaming api)
-    String serialize(Scenario scenario);
+    String serialize(Object object);
 
-    Scenario deserialize(String serializedData);
+    <T> T deserialize(String serializedData, Class<T> type);
 }
