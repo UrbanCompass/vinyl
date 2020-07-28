@@ -59,7 +59,8 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
                 BufferedWriter bw = new BufferedWriter(fw)
         ) {
             bw.write(serializedData);
-            storeMetadataForFile(Paths.get(filepath + META_SUFFIX), scenario.getMetadata(), serializer);
+            if (scenario.getMetadata() != null)
+                storeMetadataForFile(Paths.get(filepath + META_SUFFIX), scenario.getMetadata(), serializer);
         } catch (IOException e) {
             LOG.error("Error occurred while writing the data.", e);
             return false;
@@ -101,7 +102,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
                 return serializer.deserialize(metadata, ScenarioMetadata.class);
             }
         } catch (IOException e) {
-            LOG.error("Error occurred while writing the metadata.", e);
+            LOG.error("Error occurred while reading the metadata.", e);
         }
         return new ScenarioMetadata();
     }

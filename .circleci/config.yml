@@ -44,6 +44,10 @@ jobs:
 
       # run tests!
       - run: gradle test
+
+      # store test results in circle ci
+      - store_test_results:
+          path: build/test-results
       
       - codecov/upload:
           file: build/reports/jacoco/report.xml
