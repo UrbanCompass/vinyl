@@ -21,6 +21,7 @@ dependencies {
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.7.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.0'
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.7.2")
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
 }
 
