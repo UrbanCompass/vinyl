@@ -75,6 +75,8 @@ public class Vinyl {
 
         // Get the recorded scenario
         Scenario recordedScenario = player.playback(scenario, config);
+        if (recordedScenario == null)
+            return null;
 
         if (mode == Mode.CACHE) {
             ScenarioMetadata metadata = recordedScenario.getMetadata();
@@ -82,15 +84,17 @@ public class Vinyl {
                 long currentTime = System.currentTimeMillis();
 
                 // Check if the data has expired, if so, do not send the data back
-                if (metadata.getExpiryTimeInMillis() != null && metadata.getExpiryTimeInMillis() > currentTime)
+                if (metadata.getExpiryTimeInMillis() != null && metadata.getExpiryTimeInMillis() < currentTime)
                     return null;
             }
-        } else if (mode == Mode.PLAYBACK) {
+        }
+
+        else if (mode == Mode.PLAYBACK) {
             // Ignore the time to live in playback mode
             return recordedScenario;
         }
 
-        if (mode == Mode.RANDOMIZER) {
+        else if (mode == Mode.RANDOMIZER) {
             randomize(recordedScenario);
         }
 

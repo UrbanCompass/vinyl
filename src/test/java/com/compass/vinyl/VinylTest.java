@@ -54,7 +54,7 @@ public class VinylTest {
                 new Data("animals", animals));
 
         ScenarioMetadata scenarioMeta = new ScenarioMetadata();
-        scenarioMeta.setExpiryTimeInMillis((System.currentTimeMillis() + (30 * 1000)));
+        scenarioMeta.setExpiryTimeInMillis((System.currentTimeMillis() + (60 * 1000)));
         scenarioMeta.setTags(Arrays.asList("testTag"));
         expectedScenario.setMetadata(scenarioMeta);
 
@@ -254,5 +254,63 @@ public class VinylTest {
 
         // playback should be empty
         Assertions.assertNull(scenario, "Recorded file should have been cleared using the tag:" + expectedScenario.metadata.tags);
+    }
+
+    @Test
+    @Order(9)
+    void cacheMode() {
+
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.CACHE)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+
+        vinyl.clear(expectedScenario.metadata.tags);
+
+        // now playback should be empty
+        Scenario scenario = vinyl.playback(expectedScenario);
+        Assertions.assertNull(scenario, "Recorded file should have been cleared");
+
+        record();
+
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.CACHE)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+
+        // make sure playback works
+        scenario = vinyl.playback(expectedScenario);
+        List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
+        List<Animal> expectedAnimals = (List<Animal>) expectedScenario.getOutput().getValue();
+        for (int i = 0; i < expectedAnimals.size(); i++) {
+            Assertions.assertEquals(animals.get(i), expectedAnimals.get(i), "Replay of the scenario failed.");
+        }
+    }
+
+    @Test
+    @Order(9)
+    void cacheModeExpiry() {
+
+        record();
+
+        vinyl = new Vinyl.Builder()
+                .usingMode(Mode.CACHE)
+                .withPlayer(player)
+                .usingRecordingConfig(config)
+                .create();
+
+        // now playback should be present
+        Scenario scenario = vinyl.playback(expectedScenario);
+        Assertions.assertNotNull(scenario, "Recorded file should be present");
+
+        // leave it to expire & store it
+        scenario.metadata.expiryTimeInMillis = System.currentTimeMillis() - 10;
+        vinyl.record(scenario);
+
+        // now playback should be empty as cache has expired
+        scenario = vinyl.playback(expectedScenario);
+        Assertions.assertNull(scenario, "Recorded file should have been empty");
     }
 }
