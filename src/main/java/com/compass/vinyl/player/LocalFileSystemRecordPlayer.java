@@ -90,18 +90,11 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
 
     private ScenarioMetadata retrieveMetadataForFile(Path pathHandle, Serializer serializer) {
         try {
-            FileStore fs = Files.getFileStore(pathHandle);
-            boolean metaSupport = fs.supportsFileAttributeView(UserDefinedFileAttributeView.class);
-
-            // File attr isn't supported in multiple operating system - file system combination
-            boolean fileAttrEnabled = false;
-            if (metaSupport && fileAttrEnabled) {
-                throw new UnsupportedOperationException("File attr isn't supported");
-            } else {
+            if (Files.exists(pathHandle)) {
                 String metadata = new String(Files.readAllBytes(pathHandle));
                 return serializer.deserialize(metadata, ScenarioMetadata.class);
             }
-        } catch (IOException e) {
+        } catch (IOException | SecurityException e) {
             LOG.error("Error occurred while reading the metadata.", e);
         }
         return new ScenarioMetadata();
