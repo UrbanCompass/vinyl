@@ -158,10 +158,14 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
                     .forEach(it -> {
                         if (it.toString().endsWith(META_SUFFIX)) {
                             ScenarioMetadata metadata = retrieveMetadataForFile(it, config.getSerializer());
-                            metadata.getTags().retainAll(tags);
-                            if (metadata.getTags() != null && !metadata.getTags().isEmpty()) {
-                                filesToDelete.add(it);
-                                filesToDelete.add(Paths.get(it.toString().replace("_meta", "")));
+                            if (metadata.getTags() != null) {
+                                metadata.getTags().retainAll(tags);
+                                List<String> tagList = new ArrayList<>(metadata.getTags());
+                                tagList.retainAll(tags);
+                                if (!tagList.isEmpty()) {
+                                    filesToDelete.add(it);
+                                    filesToDelete.add(Paths.get(it.toString().replace("_meta", "")));
+                                }
                             }
                         }
                     });
