@@ -1,10 +1,18 @@
 @startuml
 
+'To be used with https://www.planttext.com/
+
 class Scenario {
+    ScenarioMetadata metadata
     String source
     String method
     Data[] inputs
     Data output
+}
+
+class ScenarioMetadata {
+    Long expiryInMillis
+    List<String> tags
 }
 
 interface RecordPlayer {
@@ -33,7 +41,12 @@ RecordingConfig -- Serializer
 class Vinyl {
     RecordPlayer player
     RecordingConfig config
+    record(scenario)
+    playback(scenario)
+    clearScenario(tags)
 }
+
+Scenario -- ScenarioMetadata
 
 Vinyl --- RecordPlayer
 Vinyl --- RecordingConfig
