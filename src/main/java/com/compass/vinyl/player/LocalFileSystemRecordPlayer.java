@@ -159,7 +159,6 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
                         if (it.toString().endsWith(META_SUFFIX)) {
                             ScenarioMetadata metadata = retrieveMetadataForFile(it, config.getSerializer());
                             if (metadata.getTags() != null) {
-                                metadata.getTags().retainAll(tags);
                                 List<String> tagList = new ArrayList<>(metadata.getTags());
                                 tagList.retainAll(tags);
                                 if (!tagList.isEmpty()) {
