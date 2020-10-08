@@ -1,5 +1,3 @@
-// Copyright © 2020 Compass. All rights reserved.
-
 package com.compass.vinyl.player;
 
 import com.compass.vinyl.Data;
@@ -22,11 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class LocalFileSystemRecordPlayerTest {
-
+public class DatabaseRecordPlayerTest {
     private static String recordingPath;
 
-    LocalFileSystemRecordPlayer player;
+    DatabaseRecordPlayer player;
 
     Scenario expectedScenario;
 
@@ -35,7 +32,7 @@ public class LocalFileSystemRecordPlayerTest {
     @BeforeAll
     public static void pathSetup() {
         try {
-            Path temp = Files.createTempDirectory("vinyl-");
+            Path temp = Files.createTempDirectory("vinyl-db-");
             recordingPath = temp.toAbsolutePath().toString();
         } catch (IOException e) {
             e.printStackTrace();
@@ -44,7 +41,7 @@ public class LocalFileSystemRecordPlayerTest {
 
     @BeforeEach
     public void setup() {
-        player = new LocalFileSystemRecordPlayer();
+        player = new DatabaseRecordPlayer();
         config = new RecordingConfig(JSONSerializer.getInstance(), recordingPath);
 
         List<Bird> birds = new ArrayList<>();
@@ -55,7 +52,7 @@ public class LocalFileSystemRecordPlayerTest {
         animals.add(new Lion("Alex", 23, Arrays.asList("Orange", "Yellow")));
         animals.add(new Tiger("Cat", 23, Arrays.asList("Yellow", "Black")));
 
-        expectedScenario = new Scenario(LocalFileSystemRecordPlayerTest.class.getCanonicalName(),
+        expectedScenario = new Scenario(DatabaseRecordPlayerTest.class.getCanonicalName(),
                 "test",
                 Arrays.asList(new Data("birds", birds)),
                 new Data("animals", animals));

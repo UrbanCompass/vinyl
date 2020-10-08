@@ -4,6 +4,8 @@ package com.compass.vinyl.player;
 
 import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.Scenario;
+import com.compass.vinyl.serializer.Serializer;
+import com.compass.vinyl.utils.Utilities;
 
 import java.util.List;
 
@@ -58,4 +60,8 @@ public interface RecordPlayer {
      */
     void deleteByTags(List<String> tags, RecordingConfig config);
 
+    default String getUniqueId(Scenario scenario, Serializer serializer) {
+        String inputsJson = serializer.serialize(new Scenario(scenario.getSource(), scenario.getMethod(), scenario.getInputs()));
+        return Utilities.md5(inputsJson);
+    }
 }
