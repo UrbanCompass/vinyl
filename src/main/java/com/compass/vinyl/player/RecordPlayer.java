@@ -59,9 +59,4 @@ public interface RecordPlayer {
      *      Configuration to be used while deleting
      */
     void deleteByTags(List<String> tags, RecordingConfig config);
-
-    default String getUniqueId(Scenario scenario, Serializer serializer) {
-        String inputsJson = serializer.serialize(new Scenario(scenario.getSource(), scenario.getMethod(), scenario.getInputs()));
-        return Utilities.md5(inputsJson);
-    }
 }

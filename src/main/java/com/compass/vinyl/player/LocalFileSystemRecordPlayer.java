@@ -41,7 +41,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
         Serializer serializer = config.getSerializer();
         String serializedData = serializer.serialize(scenario);
 
-        String uniqueId = getUniqueId(scenario, serializer);
+        String uniqueId = scenario.getUniqueId(serializer);
 
         File file = new File(filePath);
 
@@ -105,7 +105,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
 
         // Step-1: Get/Seek the serialized data based on the scenario
         String filePath = getFilePath(scenario, config);
-        String uniqueId = getUniqueId(scenario, config.getSerializer());
+        String uniqueId = scenario.getUniqueId(config.getSerializer());
 
         File file = new File(filePath + File.separator + uniqueId + VINYL_EXTENSION);
         String serializedData = null;
@@ -116,6 +116,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
                 serializedData = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
             } catch (IOException e) {
                 LOG.error("Error occurred while retrieving the data.", e);
+                return null;
             }
         }
 
@@ -129,7 +130,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
     public void delete(Scenario scenario, RecordingConfig config) {
         // Step-1: Seek the recorded data based on the scenario
         String filePath = getFilePath(scenario, config);
-        String uniqueId = getUniqueId(scenario, config.getSerializer());
+        String uniqueId = scenario.getUniqueId(config.getSerializer());
 
         String recordingPath = filePath + File.separator + uniqueId + VINYL_EXTENSION;
         File file = new File(recordingPath);

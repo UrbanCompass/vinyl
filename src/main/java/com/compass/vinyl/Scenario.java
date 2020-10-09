@@ -2,6 +2,9 @@
 
 package com.compass.vinyl;
 
+import com.compass.vinyl.serializer.Serializer;
+import com.compass.vinyl.utils.Utilities;
+
 import java.util.List;
 
 public class Scenario {
@@ -59,5 +62,10 @@ public class Scenario {
 
     public void setMetadata(ScenarioMetadata metadata) {
         this.metadata = metadata;
+    }
+
+    public String getUniqueId(Serializer serializer) {
+        String inputsJson = serializer.serialize(new Scenario(this.getSource(), this.getMethod(), this.getInputs()));
+        return Utilities.md5(inputsJson);
     }
 }
