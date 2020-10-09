@@ -35,16 +35,16 @@ public class DatabaseRecordPlayer implements RecordPlayer {
         Serializer serializer = config.getSerializer();
         byte[] serializedData = serializer.serialize(scenario).getBytes();
         String uniqueId = scenario.getUniqueId(serializer);
-        final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
+        List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
 
-        try (final DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
-             final RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
+        try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
+             RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
             try {
                 db.put(columnFamilyHandleList.get(0),uniqueId.getBytes(), serializedData);
                 if (scenario.getMetadata() != null)
                     storeMetadata(db,columnFamilyHandleList.get(1),serializer,scenario, uniqueId);
             } finally {
-                for (final ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
+                for (ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
                     columnFamilyHandle.close();
                 }
             }
@@ -55,7 +55,8 @@ public class DatabaseRecordPlayer implements RecordPlayer {
         return true;
     }
 
-    private void storeMetadata(RocksDB db, ColumnFamilyHandle tagColumnFamily, Serializer serializer, Scenario scenario, String uniqueId) throws RocksDBException {
+    private void storeMetadata(RocksDB db, ColumnFamilyHandle tagColumnFamily, Serializer serializer, Scenario scenario,
+                               String uniqueId) throws RocksDBException {
         for(String tag : scenario.getMetadata().getTags()) {
             byte[] fileLists = db.get(tagColumnFamily, tag.getBytes());
             HashSet<String> uniqueIds = new HashSet<>();
@@ -72,14 +73,14 @@ public class DatabaseRecordPlayer implements RecordPlayer {
     public Scenario playback(Scenario scenario, RecordingConfig config) {
         Serializer serializer = config.getSerializer();
         String uniqueId = scenario.getUniqueId(serializer);
-        final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
+        List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
         byte[] serializedData;
-        try (final DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
-             final RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
+        try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
+             RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
             try {
                 serializedData = db.get(columnFamilyHandleList.get(0), uniqueId.getBytes());
             } finally {
-                for (final ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
+                for (ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
                     columnFamilyHandle.close();
                 }
             }
@@ -99,12 +100,12 @@ public class DatabaseRecordPlayer implements RecordPlayer {
         String uniqueId = scenario.getUniqueId(serializer);
         final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
 
-        try (final DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
-             final RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
+        try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
+             RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
             try {
-                db.delete(uniqueId.getBytes());
+                db.delete(columnFamilyHandleList.get(0), uniqueId.getBytes());
             } finally {
-                for (final ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
+                for (ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
                     columnFamilyHandle.close();
                 }
             }
@@ -119,8 +120,8 @@ public class DatabaseRecordPlayer implements RecordPlayer {
         List<byte[]> tagsBytes = tags.stream().map(tag -> tag.getBytes()).collect(Collectors.toList());
         final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
 
-        try (final DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
-             final RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
+        try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
+             RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
             HashSet<String> uniqueIds = new HashSet<>();
             try {
                 Map<byte[], byte[]> uniqueIdMap = db.multiGet(columnFamilyHandleList, tagsBytes);
@@ -136,7 +137,7 @@ public class DatabaseRecordPlayer implements RecordPlayer {
                     db.delete(columnFamilyHandleList.get(1), uniqueIdMapEntry.getKey());
                 }
             } finally {
-                for (final ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
+                for (ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {
                     columnFamilyHandle.close();
                 }
             }
