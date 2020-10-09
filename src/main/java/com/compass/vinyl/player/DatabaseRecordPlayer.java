@@ -141,7 +141,7 @@ public class DatabaseRecordPlayer implements RecordPlayer {
                 }
             }
         } catch (RocksDBException e) {
-            LOG.error("Error occurred while deleting the data.", e);
+            LOG.error("Error occurred while deleting the data for tags:" + tags, e);
         }
     }
 }
