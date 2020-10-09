@@ -4,8 +4,6 @@ package com.compass.vinyl.player;
 
 import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.Scenario;
-import com.compass.vinyl.serializer.Serializer;
-import com.compass.vinyl.utils.Utilities;
 
 import java.util.List;
 
@@ -59,4 +57,5 @@ public interface RecordPlayer {
      *      Configuration to be used while deleting
      */
     void deleteByTags(List<String> tags, RecordingConfig config);
+
 }
