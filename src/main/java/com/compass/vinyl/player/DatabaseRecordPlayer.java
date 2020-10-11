@@ -19,16 +19,19 @@ import java.util.stream.Collectors;
  */
 public class DatabaseRecordPlayer implements RecordPlayer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RecordPlayer.class);
+
+    private static final String TAGS_COLUMN_FAMILY = "tags-column-family";
+
     final List<ColumnFamilyDescriptor> cfDescriptors;
 
     public DatabaseRecordPlayer(){
         RocksDB.loadLibrary();
         cfDescriptors = Arrays.asList(
                 new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY),
-                new ColumnFamilyDescriptor("tags-columnfamily".getBytes())
+                new ColumnFamilyDescriptor(TAGS_COLUMN_FAMILY.getBytes())
         );
     }
-    private static final Logger LOG = LoggerFactory.getLogger(RecordPlayer.class);
 
     @Override
     public boolean record(Scenario scenario, RecordingConfig config) {
@@ -117,24 +120,26 @@ public class DatabaseRecordPlayer implements RecordPlayer {
     @Override
     public void deleteByTags(List<String> tags, RecordingConfig config) {
         Serializer serializer = config.getSerializer();
-        List<byte[]> tagsBytes = tags.stream().map(tag -> tag.getBytes()).collect(Collectors.toList());
+        List<byte[]> tagsToDelete = tags.stream().map(tag -> tag.getBytes()).collect(Collectors.toList());
         final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
 
         try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
              RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
-            HashSet<String> uniqueIds = new HashSet<>();
+            HashSet<String> filesToDelete = new HashSet<>();
             try {
-                Map<byte[], byte[]> uniqueIdMap = db.multiGet(columnFamilyHandleList, tagsBytes);
-                for(Map.Entry<byte[], byte[]> uniqueIdMapEntry : uniqueIdMap.entrySet()){
-                    HashSet<String> uniqueFileIds = serializer.deserialize(new String(uniqueIdMapEntry.getValue()) ,HashSet.class);
-                    uniqueFileIds.forEach(uniqueFileId -> {
-                        try {
-                            db.delete(columnFamilyHandleList.get(0), uniqueFileId.getBytes());
-                        } catch (RocksDBException e) {
-                            LOG.error("Error occurred while deleting file {}",uniqueFileId,e);
-                        }
-                    });
-                    db.delete(columnFamilyHandleList.get(1), uniqueIdMapEntry.getKey());
+                for(byte[] tagToDelete : tagsToDelete){
+                    byte[] uniqueFileId = db.get(columnFamilyHandleList.get(1), tagToDelete);
+                    if(Objects.nonNull(uniqueFileId)) {
+                        HashSet<String> uniqueFileIds = serializer.deserialize(new String(uniqueFileId), HashSet.class);
+                        filesToDelete.addAll(uniqueFileIds);
+                    }
+                }
+
+                for(String fileToDelete : filesToDelete){
+                    db.delete(columnFamilyHandleList.get(0), fileToDelete.getBytes());
+                }
+                for(byte[] tagEntryToDelete : tagsToDelete){
+                    db.delete(columnFamilyHandleList.get(1), tagEntryToDelete);
                 }
             } finally {
                 for (ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {

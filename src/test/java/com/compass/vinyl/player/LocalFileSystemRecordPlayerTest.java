@@ -5,6 +5,7 @@ package com.compass.vinyl.player;
 import com.compass.vinyl.Data;
 import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.Scenario;
+import com.compass.vinyl.ScenarioMetadata;
 import com.compass.vinyl.serializer.JSONSerializer;
 import com.compass.vinyl.serializer.models.Animal;
 import com.compass.vinyl.serializer.models.Bird;
@@ -31,6 +32,8 @@ public class LocalFileSystemRecordPlayerTest {
     Scenario expectedScenario;
 
     RecordingConfig config;
+
+    List<String> tags;
 
     @BeforeAll
     public static void pathSetup() {
@@ -59,6 +62,11 @@ public class LocalFileSystemRecordPlayerTest {
                 "test",
                 Arrays.asList(new Data("birds", birds)),
                 new Data("animals", animals));
+
+        tags = Arrays.asList("animal");
+        ScenarioMetadata scenarioMetadata = new ScenarioMetadata();
+        scenarioMetadata.setTags(tags);
+        expectedScenario.setMetadata(scenarioMetadata);
     }
 
     @Test
@@ -78,9 +86,25 @@ public class LocalFileSystemRecordPlayerTest {
     }
 
     @Test
+    public void playbackWithMissingScenario() {
+        Scenario missingScenario = new Scenario("NA","NA",null);
+        Scenario scenario = player.playback(missingScenario, config);
+        Assertions.assertNull(scenario, "Scenario doesn't exist but result is not null.");
+    }
+
+    @Test
     public void delete() {
         player.delete(expectedScenario, config);
         Scenario scenario = player.playback(expectedScenario, config);
         Assertions.assertNull(scenario);
+    }
+
+    @Test
+    public void deleteByTags() {
+        boolean status = player.record(expectedScenario, config);
+        Assertions.assertTrue(status, "Recording of the scenario failed.");
+        player.deleteByTags(tags, config);
+        Scenario scenario = player.playback(expectedScenario, config);
+        Assertions.assertNull(scenario, "Scenario doesn't exist but result is not null.");
     }
 }
