@@ -94,6 +94,7 @@ class VinylInterceptorTest {
         HttpUrl baseUrl = server.url("/v1/service/fetchData/");
 
         Interceptor interceptor = new VinylInterceptor.OkHttpInterceptor(vinyl);
+        ((VinylInterceptor.OkHttpInterceptor) interceptor).setRecordLengthThreshold(5 * 1024 * 1024L);
 
         client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
@@ -116,5 +117,4 @@ class VinylInterceptorTest {
                     expected.getMessage());
         }
     }
-
 }
