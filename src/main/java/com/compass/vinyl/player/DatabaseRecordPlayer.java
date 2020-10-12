@@ -23,7 +23,11 @@ public class DatabaseRecordPlayer implements RecordPlayer {
 
     private static final String TAGS_COLUMN_FAMILY = "tags-column-family";
 
+    private static final Integer TTL_SECONDS = 24*60*60;
+
     final List<ColumnFamilyDescriptor> cfDescriptors;
+
+    final List<Integer> ttlValues;
 
     public DatabaseRecordPlayer(){
         RocksDB.loadLibrary();
@@ -31,6 +35,7 @@ public class DatabaseRecordPlayer implements RecordPlayer {
                 new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY),
                 new ColumnFamilyDescriptor(TAGS_COLUMN_FAMILY.getBytes())
         );
+        ttlValues = Arrays.asList(TTL_SECONDS, TTL_SECONDS);
     }
 
     @Override
@@ -41,7 +46,7 @@ public class DatabaseRecordPlayer implements RecordPlayer {
         List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
 
         try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
-             RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
+             TtlDB db = TtlDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList, ttlValues, false)) {
             try {
                 db.put(columnFamilyHandleList.get(0),uniqueId.getBytes(), serializedData);
                 if (scenario.getMetadata() != null)
@@ -61,10 +66,10 @@ public class DatabaseRecordPlayer implements RecordPlayer {
     private void storeMetadata(RocksDB db, ColumnFamilyHandle tagColumnFamily, Serializer serializer, Scenario scenario,
                                String uniqueId) throws RocksDBException {
         for(String tag : scenario.getMetadata().getTags()) {
-            byte[] fileLists = db.get(tagColumnFamily, tag.getBytes());
+            byte[] uniqueScenarioIds = db.get(tagColumnFamily, tag.getBytes());
             HashSet<String> uniqueIds = new HashSet<>();
-            if(Objects.nonNull(fileLists)){
-                uniqueIds = serializer.deserialize(new String(fileLists) ,HashSet.class);
+            if(Objects.nonNull(uniqueScenarioIds)){
+                uniqueIds = serializer.deserialize(new String(uniqueScenarioIds) ,HashSet.class);
             }
             uniqueIds.add(uniqueId);
             byte[] serializedIds = serializer.serialize(uniqueIds).getBytes();
@@ -78,8 +83,10 @@ public class DatabaseRecordPlayer implements RecordPlayer {
         String uniqueId = scenario.getUniqueId(serializer);
         List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>();
         byte[] serializedData;
-        try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
-             RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
+        try (DBOptions options = new DBOptions()
+                            .setCreateIfMissing(true)
+                            .setCreateMissingColumnFamilies(true);
+             RocksDB db = RocksDB.openReadOnly(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
             try {
                 serializedData = db.get(columnFamilyHandleList.get(0), uniqueId.getBytes());
             } finally {
@@ -125,19 +132,19 @@ public class DatabaseRecordPlayer implements RecordPlayer {
 
         try (DBOptions options = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
              RocksDB db = RocksDB.open(options, config.getRecordingPath(), cfDescriptors, columnFamilyHandleList)) {
-            HashSet<String> filesToDelete = new HashSet<>();
+            HashSet<String> scenariosToDelete = new HashSet<>();
             try {
                 for(byte[] tagToDelete : tagsToDelete){
-                    byte[] uniqueFileId = db.get(columnFamilyHandleList.get(1), tagToDelete);
-                    if(Objects.nonNull(uniqueFileId)) {
-                        HashSet<String> uniqueFileIds = serializer.deserialize(new String(uniqueFileId), HashSet.class);
-                        filesToDelete.addAll(uniqueFileIds);
+                    byte[] uniqueScenarioIds = db.get(columnFamilyHandleList.get(1), tagToDelete);
+                    if(Objects.nonNull(uniqueScenarioIds)) {
+                        HashSet<String> scenarioIds = serializer.deserialize(new String(uniqueScenarioIds), HashSet.class);
+                        scenariosToDelete.addAll(scenarioIds);
                     }
                     db.delete(columnFamilyHandleList.get(1), tagToDelete);
                 }
 
-                for(String fileToDelete : filesToDelete){
-                    db.delete(columnFamilyHandleList.get(0), fileToDelete.getBytes());
+                for(String scenarioToDelete : scenariosToDelete){
+                    db.delete(columnFamilyHandleList.get(0), scenarioToDelete.getBytes());
                 }
             } finally {
                 for (ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {

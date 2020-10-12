@@ -11,10 +11,7 @@ import com.compass.vinyl.serializer.models.Animal;
 import com.compass.vinyl.serializer.models.Bird;
 import com.compass.vinyl.serializer.models.Lion;
 import com.compass.vinyl.serializer.models.Tiger;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LocalFileSystemRecordPlayerTest {
 
     private static String recordingPath;
@@ -68,12 +66,14 @@ public class LocalFileSystemRecordPlayerTest {
     }
 
     @Test
+    @Order(-1)
     public void record() {
         boolean status = player.record(expectedScenario, config);
         Assertions.assertTrue(status, "Recording of the scenario failed.");
     }
 
     @Test
+    @Order(0)
     public void playback() {
         Scenario scenario = player.playback(expectedScenario, config);
         List<Animal> animals = (List<Animal>) scenario.getOutput().getValue();
@@ -84,6 +84,7 @@ public class LocalFileSystemRecordPlayerTest {
     }
 
     @Test
+    @Order(1)
     public void playbackWithMissingScenario() {
         Scenario missingScenario = new Scenario("NA","NA",null);
         Scenario scenario = player.playback(missingScenario, config);
@@ -91,14 +92,17 @@ public class LocalFileSystemRecordPlayerTest {
     }
 
     @Test
+    @Order(2)
     public void delete() {
         player.delete(expectedScenario, config);
         Scenario scenario = player.playback(expectedScenario, config);
-        Assertions.assertNull(scenario);
+        Assertions.assertNull(scenario, "Scenario doesn't exist but result is not null.");
     }
 
     @Test
+    @Order(3)
     public void deleteByTags() {
+        record();
         player.deleteByTags(tags, config);
         Scenario scenario = player.playback(expectedScenario, config);
         Assertions.assertNull(scenario, "Scenario doesn't exist but result is not null.");
