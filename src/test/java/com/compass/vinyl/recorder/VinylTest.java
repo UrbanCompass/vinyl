@@ -2,25 +2,19 @@ package com.compass.vinyl.recorder;
 
 import com.compass.vinyl.*;
 import com.compass.vinyl.player.RecordPlayer;
-import com.compass.vinyl.serializer.Serializer;
 import com.compass.vinyl.serializer.models.Animal;
 import com.compass.vinyl.serializer.models.Bird;
 import com.compass.vinyl.serializer.models.Lion;
 import com.compass.vinyl.serializer.models.Tiger;
 import org.junit.jupiter.api.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class VinylTest {
-
-    private static String recordingPath;
+public abstract class VinylTest {
 
     private Vinyl vinyl;
 
@@ -30,13 +24,7 @@ public class VinylTest {
 
     private static RecordingConfig config;
 
-    public static void setup(RecordPlayer playerToBeUsed, Serializer serializer) {
-        try {
-            Path temp = Files.createTempDirectory("vinyl-");
-            recordingPath = temp.toAbsolutePath().toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void setup(RecordPlayer playerToBeUsed, RecordingConfig configToBeUsed) {
 
         List<Bird> birds = new ArrayList<>();
         birds.add(new Bird("Parrot"));
@@ -46,7 +34,7 @@ public class VinylTest {
         animals.add(new Lion("Alex", 23, Arrays.asList("Orange", "Yellow")));
         animals.add(new Tiger("Cat", 23, Arrays.asList("Yellow", "Black")));
 
-        expectedScenario = new Scenario(VinylTest.class.getCanonicalName(),
+        expectedScenario = new Scenario(playerToBeUsed.getClass().getCanonicalName(),
                 "test",
                 Collections.singletonList(new Data("birds", birds)),
                 new Data("animals", animals));
@@ -57,7 +45,7 @@ public class VinylTest {
         expectedScenario.setMetadata(scenarioMeta);
 
         player = playerToBeUsed;
-        config = new RecordingConfig(serializer, recordingPath);
+        config = configToBeUsed;
     }
 
     @Test
