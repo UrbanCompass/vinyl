@@ -2,7 +2,6 @@ package com.compass.vinyl.recorder;
 
 import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.player.LocalFileSystemRecordPlayer;
-import com.compass.vinyl.player.RecordPlayer;
 import com.compass.vinyl.serializer.JSONSerializer;
 import com.compass.vinyl.serializer.Serializer;
 import org.junit.jupiter.api.*;
