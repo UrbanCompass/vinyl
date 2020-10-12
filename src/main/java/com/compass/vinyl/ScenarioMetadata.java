@@ -10,6 +10,12 @@ public class ScenarioMetadata {
 
     List<String> tags;
 
+    public ScenarioMetadata(){}
+
+    public ScenarioMetadata(List<String> tags){
+        this.tags = tags;
+    }
+
     public List<String> getTags() {
         return tags;
     }

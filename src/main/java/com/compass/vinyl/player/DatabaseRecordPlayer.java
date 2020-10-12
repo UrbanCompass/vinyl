@@ -133,13 +133,11 @@ public class DatabaseRecordPlayer implements RecordPlayer {
                         HashSet<String> uniqueFileIds = serializer.deserialize(new String(uniqueFileId), HashSet.class);
                         filesToDelete.addAll(uniqueFileIds);
                     }
+                    db.delete(columnFamilyHandleList.get(1), tagToDelete);
                 }
 
                 for(String fileToDelete : filesToDelete){
                     db.delete(columnFamilyHandleList.get(0), fileToDelete.getBytes());
-                }
-                for(byte[] tagEntryToDelete : tagsToDelete){
-                    db.delete(columnFamilyHandleList.get(1), tagEntryToDelete);
                 }
             } finally {
                 for (ColumnFamilyHandle columnFamilyHandle : columnFamilyHandleList) {

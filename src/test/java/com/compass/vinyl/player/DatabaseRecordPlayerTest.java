@@ -58,9 +58,7 @@ public class DatabaseRecordPlayerTest {
                 new Data("animals", animals));
 
         tags = Arrays.asList("animal");
-        ScenarioMetadata scenarioMetadata = new ScenarioMetadata();
-        scenarioMetadata.setTags(tags);
-        expectedScenario.setMetadata(scenarioMetadata);
+        expectedScenario.setMetadata(new ScenarioMetadata(tags));
     }
 
     @Test
@@ -95,8 +93,6 @@ public class DatabaseRecordPlayerTest {
 
     @Test
     public void deleteByTags() {
-        boolean status = player.record(expectedScenario, config);
-        Assertions.assertTrue(status, "Recording of the scenario failed.");
         player.deleteByTags(tags, config);
         Scenario scenario = player.playback(expectedScenario, config);
         Assertions.assertNull(scenario, "Scenario doesn't exist but result is not null.");
