@@ -4,11 +4,11 @@ package com.compass.vinyl;
 
 public class Data {
 
-    String typeInfo;
+    private String typeInfo;
 
-    String name;
+    private String name;
 
-    Object value;
+    private Object value;
 
     public Data(String name, Object value) {
         this.typeInfo = value.getClass().getCanonicalName();

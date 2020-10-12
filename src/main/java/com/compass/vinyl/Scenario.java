@@ -9,17 +9,17 @@ import java.util.List;
 
 public class Scenario {
 
-    String source;
+    private String source;
 
-    String method;
+    private String method;
 
-    String identifier;
+    private String identifier;
 
-    ScenarioMetadata metadata;
+    private ScenarioMetadata metadata;
 
-    List<Data> inputs;
+    private List<Data> inputs;
 
-    Data output;
+    private Data output;
 
     public Scenario(String source, String method, List<Data> inputs, Data output) {
         this.source = source;
