@@ -6,7 +6,6 @@ import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.Scenario;
 import com.compass.vinyl.ScenarioMetadata;
 import com.compass.vinyl.serializer.Serializer;
-import com.compass.vinyl.utils.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
@@ -34,6 +32,8 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
 
     private static final String META_SUFFIX = "_meta";
 
+    private static final String VINYL_EXTENSION = ".vinyl";
+
     @Override
     public boolean record(Scenario scenario, RecordingConfig config) {
         String filePath = getFilePath(scenario, config);
@@ -41,7 +41,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
         Serializer serializer = config.getSerializer();
         String serializedData = serializer.serialize(scenario);
 
-        String uniqueId = getUniqueId(scenario, serializer);
+        String uniqueId = scenario.getUniqueId(serializer);
 
         File file = new File(filePath);
 
@@ -53,7 +53,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
                 LOG.warn("Scenario based folder couldn't be created. Folder=" + file.getAbsolutePath());
         }
 
-        String filepath = file.getAbsoluteFile() + File.separator + uniqueId + ".vinyl";
+        String filepath = file.getAbsoluteFile() + File.separator + uniqueId + VINYL_EXTENSION;
         try (
                 FileWriter fw = new FileWriter(filepath);
                 BufferedWriter bw = new BufferedWriter(fw)
@@ -105,9 +105,9 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
 
         // Step-1: Get/Seek the serialized data based on the scenario
         String filePath = getFilePath(scenario, config);
-        String uniqueId = getUniqueId(scenario, config.getSerializer());
+        String uniqueId = scenario.getUniqueId(config.getSerializer());
 
-        File file = new File(filePath + File.separator + uniqueId + ".vinyl");
+        File file = new File(filePath + File.separator + uniqueId + VINYL_EXTENSION);
         String serializedData = null;
 
         // Step-2: If file exists get the recorded data
@@ -115,7 +115,8 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
             try {
                 serializedData = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
             } catch (IOException e) {
-                LOG.error("Error occurred while writing the data.", e);
+                LOG.error("Error occurred while retrieving the data.", e);
+                return null;
             }
         }
 
@@ -129,9 +130,9 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
     public void delete(Scenario scenario, RecordingConfig config) {
         // Step-1: Seek the recorded data based on the scenario
         String filePath = getFilePath(scenario, config);
-        String uniqueId = getUniqueId(scenario, config.getSerializer());
+        String uniqueId = scenario.getUniqueId(config.getSerializer());
 
-        String recordingPath = filePath + File.separator + uniqueId + ".vinyl";
+        String recordingPath = filePath + File.separator + uniqueId + VINYL_EXTENSION;
         File file = new File(recordingPath);
 
         // Step-2: If exists delete the file
@@ -163,7 +164,7 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
                                 tagList.retainAll(tags);
                                 if (!tagList.isEmpty()) {
                                     filesToDelete.add(it);
-                                    filesToDelete.add(Paths.get(it.toString().replace("_meta", "")));
+                                    filesToDelete.add(Paths.get(it.toString().replace(META_SUFFIX, "")));
                                 }
                             }
                         }
@@ -187,10 +188,5 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
 
     private String normalizeName(String filename) {
         return filename.replaceAll("[^A-Za-z0-9]", "_");
-    }
-
-    private String getUniqueId(Scenario scenario, Serializer serializer) {
-        String inputsJson = serializer.serialize(new Scenario(scenario.getSource(), scenario.getMethod(), scenario.getInputs()));
-        return Utilities.md5(inputsJson);
     }
 }

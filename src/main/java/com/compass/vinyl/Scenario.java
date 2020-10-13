@@ -2,21 +2,24 @@
 
 package com.compass.vinyl;
 
+import com.compass.vinyl.serializer.Serializer;
+import com.compass.vinyl.utils.Utilities;
+
 import java.util.List;
 
 public class Scenario {
 
-    String source;
+    private String source;
 
-    String method;
+    private String method;
 
-    String identifier;
+    private String identifier;
 
-    ScenarioMetadata metadata;
+    private ScenarioMetadata metadata;
 
-    List<Data> inputs;
+    private List<Data> inputs;
 
-    Data output;
+    private Data output;
 
     public Scenario(String source, String method, List<Data> inputs, Data output) {
         this.source = source;
@@ -59,5 +62,10 @@ public class Scenario {
 
     public void setMetadata(ScenarioMetadata metadata) {
         this.metadata = metadata;
+    }
+
+    public String getUniqueId(Serializer serializer) {
+        String inputsJson = serializer.serialize(new Scenario(this.getSource(), this.getMethod(), this.getInputs()));
+        return Utilities.md5(inputsJson);
     }
 }

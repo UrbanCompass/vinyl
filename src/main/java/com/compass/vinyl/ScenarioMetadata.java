@@ -6,9 +6,15 @@ import java.util.List;
 
 public class ScenarioMetadata {
 
-    Long expiryTimeInMillis;
+    private Long expiryTimeInMillis;
 
-    List<String> tags;
+    private List<String> tags;
+
+    public ScenarioMetadata(){}
+
+    public ScenarioMetadata(List<String> tags){
+        this.tags = tags;
+    }
 
     public List<String> getTags() {
         return tags;

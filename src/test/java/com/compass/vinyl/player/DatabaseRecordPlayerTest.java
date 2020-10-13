@@ -1,5 +1,3 @@
-// Copyright © 2020 Compass. All rights reserved.
-
 package com.compass.vinyl.player;
 
 import com.compass.vinyl.RecordingConfig;
@@ -11,14 +9,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class LocalFileSystemRecordPlayerTest extends RecordPlayerTest{
+public class DatabaseRecordPlayerTest extends RecordPlayerTest {
 
     private static String recordingPath;
 
     @BeforeAll
     public static void setup() {
         try {
-            Path temp = Files.createTempDirectory("vinyl-");
+            Path temp = Files.createTempDirectory("vinyl-db-");
             recordingPath = temp.toAbsolutePath().toString();
         } catch (IOException e) {
             e.printStackTrace();
@@ -26,6 +24,6 @@ public class LocalFileSystemRecordPlayerTest extends RecordPlayerTest{
 
         Serializer serializer = JSONSerializer.getInstance();
         RecordingConfig config = new RecordingConfig(serializer, recordingPath);
-        setup(new LocalFileSystemRecordPlayer(), config);
+        setup(new DatabaseRecordPlayer(), config);
     }
 }

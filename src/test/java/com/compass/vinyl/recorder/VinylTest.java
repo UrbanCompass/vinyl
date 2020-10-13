@@ -1,27 +1,20 @@
-package com.compass.vinyl;
+package com.compass.vinyl.recorder;
 
-import com.compass.vinyl.player.LocalFileSystemRecordPlayer;
-import com.compass.vinyl.player.LocalFileSystemRecordPlayerTest;
+import com.compass.vinyl.*;
 import com.compass.vinyl.player.RecordPlayer;
-import com.compass.vinyl.serializer.JSONSerializer;
 import com.compass.vinyl.serializer.models.Animal;
 import com.compass.vinyl.serializer.models.Bird;
 import com.compass.vinyl.serializer.models.Lion;
 import com.compass.vinyl.serializer.models.Tiger;
 import org.junit.jupiter.api.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class VinylTest {
-
-    private static String recordingPath;
+public abstract class VinylTest {
 
     private Vinyl vinyl;
 
@@ -31,14 +24,7 @@ public class VinylTest {
 
     private static RecordingConfig config;
 
-    @BeforeAll
-    public static void pathSetup() {
-        try {
-            Path temp = Files.createTempDirectory("vinyl-");
-            recordingPath = temp.toAbsolutePath().toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void setup(RecordPlayer playerToBeUsed, RecordingConfig configToBeUsed) {
 
         List<Bird> birds = new ArrayList<>();
         birds.add(new Bird("Parrot"));
@@ -48,7 +34,7 @@ public class VinylTest {
         animals.add(new Lion("Alex", 23, Arrays.asList("Orange", "Yellow")));
         animals.add(new Tiger("Cat", 23, Arrays.asList("Yellow", "Black")));
 
-        expectedScenario = new Scenario(LocalFileSystemRecordPlayerTest.class.getCanonicalName(),
+        expectedScenario = new Scenario(playerToBeUsed.getClass().getCanonicalName(),
                 "test",
                 Collections.singletonList(new Data("birds", birds)),
                 new Data("animals", animals));
@@ -58,13 +44,8 @@ public class VinylTest {
         scenarioMeta.setTags(Arrays.asList("testTag"));
         expectedScenario.setMetadata(scenarioMeta);
 
-        player = new LocalFileSystemRecordPlayer();
-        config = new RecordingConfig(JSONSerializer.getInstance(), recordingPath);
-    }
-
-    @BeforeEach
-    public void setup() {
-
+        player = playerToBeUsed;
+        config = configToBeUsed;
     }
 
     @Test
@@ -192,8 +173,8 @@ public class VinylTest {
         vinyl.record(scenario2);
 
         Scenario output2 = vinyl.playback(new Scenario(scenario2.getSource(), scenario2.getMethod(), scenario2.getInputs()));
-        Assertions.assertEquals(scenario2.output.value,
-                output2.output.value,
+        Assertions.assertEquals(scenario2.getOutput().getValue(),
+                output2.getOutput().getValue(),
                 "Output doesn't match with the recorded data");
     }
 
@@ -247,13 +228,13 @@ public class VinylTest {
         }
 
         // clear the scenario using tags
-        vinyl.clear(expectedScenario.metadata.tags);
+        vinyl.clear(expectedScenario.getMetadata().getTags());
 
         // now playback should be empty
         scenario = vinyl.playback(expectedScenario);
 
         // playback should be empty
-        Assertions.assertNull(scenario, "Recorded file should have been cleared using the tag:" + expectedScenario.metadata.tags);
+        Assertions.assertNull(scenario, "Recorded file should have been cleared using the tag:" + expectedScenario.getMetadata().getTags());
     }
 
     @Test
@@ -266,7 +247,7 @@ public class VinylTest {
                 .usingRecordingConfig(config)
                 .create();
 
-        vinyl.clear(expectedScenario.metadata.tags);
+        vinyl.clear(expectedScenario.getMetadata().getTags());
 
         // now playback should be empty
         Scenario scenario = vinyl.playback(expectedScenario);
@@ -306,7 +287,7 @@ public class VinylTest {
         Assertions.assertNotNull(scenario, "Recorded file should be present");
 
         // leave it to expire & store it
-        scenario.metadata.expiryTimeInMillis = System.currentTimeMillis() - 10;
+        scenario.getMetadata().setExpiryTimeInMillis(System.currentTimeMillis() - 10);
         vinyl.record(scenario);
 
         // now playback should be empty as cache has expired
