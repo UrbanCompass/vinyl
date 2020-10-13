@@ -105,10 +105,10 @@ Vinyl vinyl = new Vinyl.Builder().usingMode(Mode.RECORD)
             .create();
 ```
 
-##How to include vinyl as dependency
+## How to include vinyl as dependency
 
-####Maven:
-```maven
+#### Maven:
+```Maven
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -123,7 +123,7 @@ Vinyl vinyl = new Vinyl.Builder().usingMode(Mode.RECORD)
 </dependency>
 ```
 
-####Gradle:
+#### Gradle:
 ```gradle
 allprojects {
     repositories {
