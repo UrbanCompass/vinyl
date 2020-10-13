@@ -73,24 +73,34 @@ else {
 ```
 
 ## How to create an instance of Vinyl?
-Like Vinyl music device (from which this library took inspiration from), Vinyl requires a player to record & playback the data. The player also needs to know what serialization format is used in storing/retrieving the data. Right now, Vinyl has support for disk based player & JSON serialization. Here is how to initialize the vinyl library:
+Like Vinyl music device (from which this library took inspiration from), Vinyl requires a player to record & playback the data. The player also needs to know what serialization format is used in storing/retrieving the data. Right now, Vinyl has support for disk based player, database based player(using [rocksDB](https://github.com/facebook/rocksdb)) & JSON serialization. Here is how to initialize the vinyl library:
 #### Kotlin:
 ```kotlin
 val serializer: Serializer = JSONSerializer.getInstance()
 
-val player: RecordPlayer = LocalFileSystemRecordPlayer()
+//To use file based player
+val fileBasedPlayer: RecordPlayer = LocalFileSystemRecordPlayer()
+
+//To use database based player
+val databaseBasedPlayer: RecordPlayer = DatabaseRecordPlayer()
     
 val vinyl: Vinyl = Vinyl.Builder().usingMode(Mode.RECORD)
             .usingRecordingConfig(RecordingConfig(serializer, "/tmp/vinyl"))
-            .withPlayer(player)
+            .withPlayer(fileBasedPlayer)
             .create()
 ```
 #### Java:
 ```Java
 Serializer serializer = JSONSerializer.getInstance();
-RecordPlayer player = new LocalFileSystemRecordPlayer();
+
+//To use file based player
+RecordPlayer fileBasedPlayer = new LocalFileSystemRecordPlayer();
+
+//To use database based player
+RecordPlayer databaseBasedPlayer = new DatabaseRecordPlayer();
+
 Vinyl vinyl = new Vinyl.Builder().usingMode(Mode.RECORD)
             .usingRecordingConfig(new RecordingConfig(serializer, "/tmp/vinyl"))
-            .withPlayer(player)
+            .withPlayer(databaseBasedPlayer)
             .create();
 ```
