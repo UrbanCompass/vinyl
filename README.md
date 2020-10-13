@@ -1,4 +1,4 @@
-# ![Vinyl](vinyl.png) Vinyl  ![kotlin](https://img.shields.io/badge/kotlin-compatible-success?logo=kotlin&style=flat) [![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl.svg?style=svg&circle-token=a8cb778fca5ae22550cac7d9a394808114a3feed)](https://circleci.com/gh/UrbanCompass/vinyl) [![codecov](https://codecov.io/gh/UrbanCompass/vinyl/branch/master/graph/badge.svg?token=1OJUZZ00ZA)](https://codecov.io/gh/UrbanCompass/vinyl)  
+# ![Vinyl](vinyl.png) Vinyl  ![kotlin](https://img.shields.io/badge/kotlin-compatible-success?logo=kotlin&style=flat) [![CircleCI](https://circleci.com/gh/UrbanCompass/vinyl.svg?style=svg&circle-token=a8cb778fca5ae22550cac7d9a394808114a3feed)](https://circleci.com/gh/UrbanCompass/vinyl) [![codecov](https://codecov.io/gh/UrbanCompass/vinyl/branch/master/graph/badge.svg?token=1OJUZZ00ZA)](https://codecov.io/gh/UrbanCompass/vinyl) [![](https://jitpack.io/v/UrbanCompass/vinyl.svg)](https://jitpack.io/#UrbanCompass/vinyl)
 A lightweight library to record &amp; playback execution data across code flows. Here are some basic problems this library is trying to solve:
   - Double up as a cache for network boundaries between systems
   - Make integration tests perform at the speed for unit tests (narrow the gap)
@@ -103,4 +103,36 @@ Vinyl vinyl = new Vinyl.Builder().usingMode(Mode.RECORD)
             .usingRecordingConfig(new RecordingConfig(serializer, "/tmp/vinyl"))
             .withPlayer(databaseBasedPlayer)
             .create();
+```
+
+##How to include vinyl as dependency
+
+####Maven:
+```maven
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.UrbanCompass</groupId>
+    <artifactId>vinyl</artifactId>
+    <version>2.0</version>
+</dependency>
+```
+
+####Gradle:
+```gradle
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    implementation 'com.github.UrbanCompass:vinyl:2.0'
+}
 ```
