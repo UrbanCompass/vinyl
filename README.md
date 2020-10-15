@@ -12,6 +12,9 @@ This library has been integrated for network calls in mobile development/testing
 
 ## What was the impact after integrating Vinyl?
 
+### Build Integration
+Jitpack (maven & gradle): https://jitpack.io/#UrbanCompass/vinyl
+
 ### Integration at the speed of Unit Tests
 Integration tests typically have long execution times as it accesses external resources for loading data. This poses a huge challenge, if we have to run integration tests more frequently (as frequent as the unit tests). With Vinyl recording the data for external interactions, it acts as a stub playing back the recorded data for the given inputs. This makes the integration tests run faster by multifold.
 
