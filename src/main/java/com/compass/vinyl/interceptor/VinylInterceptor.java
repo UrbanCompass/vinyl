@@ -9,13 +9,61 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.DatatypeConverter;
 
 public class VinylInterceptor {
 
     public static class OkHttpInterceptor implements Interceptor {
+
+        private static final boolean HEAD_PEEK = true ;
+
+        public static String checkSum(String string)  {
+            try {
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte[] thedigest = md.digest(string.getBytes());
+                return DatatypeConverter.printHexBinary(thedigest);
+            } catch (NoSuchAlgorithmException e){
+                return "0";
+            }
+        }
+
+        private static Response peekAndGet( Scenario recordedScenario, Chain chain ) throws IOException {
+            Request original = chain.request();
+            String responseJSON = (String) recordedScenario.getOutput().getValue();
+            Response cachedResponse = new Response.Builder()
+                    .request(original)
+                    .protocol(Protocol.HTTP_1_1)
+                    .code(201)
+                    .message("")
+                    .body(ResponseBody.create(responseJSON, okhttp3.MediaType.parse(MEDIA_TYPE_JSON)))
+                    .build();
+            if ( HEAD_PEEK ){
+                // create another one from the original
+                Request headRequest = original.newBuilder().head().build();
+                Response headResponse = chain.proceed(headRequest);
+                String checkSum = headResponse.header( COMPASS_HEAD_CHECKSUM , "");
+                if ( checkSum.isEmpty() ){
+                    return cachedResponse;
+                }
+                String cachedCheckSum  = checkSum(responseJSON);
+                //  obvious... yes?
+                if ( cachedCheckSum.equals( checkSum ) ){
+                    return cachedResponse;
+                }
+                // now, here, we go for the actual call
+                Response response = chain.proceed(original);
+                return response;
+            }
+            return cachedResponse;
+        }
 
         private static final String MEDIA_TYPE_JSON = "application/json; charset=utf-8";
 
@@ -28,6 +76,8 @@ public class VinylInterceptor {
         private final long THRESHOLD_5MB = 5 * 1024 * 1024L;
 
         private static final String COMPASS_RESPONSE_FILTER = "X-Compass-Response-Filter";
+
+        private static final String COMPASS_HEAD_CHECKSUM = "X-Compass-CHECKSUM";
 
         private static final Logger LOG = LoggerFactory.getLogger(OkHttpInterceptor.class);
 
@@ -67,14 +117,7 @@ public class VinylInterceptor {
                 vinyl.record(new Scenario(url, method, inputs, output));
             }
             else {
-                String responseJSON = (String) recordedScenario.getOutput().getValue();
-                response = new Response.Builder()
-                        .request(request)
-                        .protocol(Protocol.HTTP_1_1)
-                        .code(201)
-                        .message("")
-                        .body(ResponseBody.create(responseJSON, okhttp3.MediaType.parse(MEDIA_TYPE_JSON)))
-                        .build();
+                response = peekAndGet(recordedScenario,chain);
             }
             return response;
         }
