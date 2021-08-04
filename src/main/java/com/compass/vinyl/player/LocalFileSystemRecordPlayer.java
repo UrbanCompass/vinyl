@@ -6,6 +6,7 @@ import com.compass.vinyl.RecordingConfig;
 import com.compass.vinyl.Scenario;
 import com.compass.vinyl.ScenarioMetadata;
 import com.compass.vinyl.serializer.Serializer;
+import com.compass.vinyl.utils.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,8 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
     private static final String META_SUFFIX = "_meta";
 
     private static final String VINYL_EXTENSION = ".vinyl";
+
+    private static final int MAX_SOURCE_LENGTH = 255;
 
     @Override
     public boolean record(Scenario scenario, RecordingConfig config) {
@@ -181,9 +184,12 @@ public class LocalFileSystemRecordPlayer implements RecordPlayer {
     }
 
     private String getFilePath(Scenario scenario, RecordingConfig config) {
-        String path = config.getRecordingPath();
-        return path + File.separator
-                + normalizeName(scenario.getSource()) + File.separator + normalizeName(scenario.getMethod());
+        String basePath = config.getRecordingPath();
+        String source = scenario.getSource();
+        if (scenario.getSource().length() > MAX_SOURCE_LENGTH) {
+            source = Utilities.md5(normalizeName(scenario.getSource()));
+        }
+        return basePath + File.separator + source + File.separator + normalizeName(scenario.getMethod());
     }
 
     private String normalizeName(String filename) {
