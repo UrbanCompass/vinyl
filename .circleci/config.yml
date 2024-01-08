@@ -4,9 +4,6 @@
 #
 version: 2.1
 
-orbs:
-  codecov: codecov/codecov@1.0.2
-  
 jobs:
   build:
     docker:
@@ -49,5 +46,3 @@ jobs:
       - store_test_results:
           path: build/test-results
       
-      - codecov/upload:
-          file: build/reports/jacoco/report.xml
